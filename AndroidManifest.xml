@@ -1,0 +1,18 @@
+<manifest package="io.ennovatex.sentineledge">
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+
+    <application
+        android:allowBackup="true"
+        android:label="SentinelEdge">
+        <service
+            android:name=".agents.AgentForegroundService"
+            android:foregroundServiceType="location|mediaPlayback|connectedDevice"
+            android:exported="false"/>
+        <activity android:name=".ui.MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>
