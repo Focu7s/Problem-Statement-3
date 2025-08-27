@@ -1,0 +1,22 @@
+package io.ennovatex.sentineledge.agents
+
+import android.content.Context
+import kotlin.math.exp
+
+class RiskFusion(private val ctx: Context, private val manager: AgentManager) {
+    private var smoothedRisk = 0.0f
+    private val alpha = 0.6f // smoothing factor
+
+    fun computeRisk(): Float {
+        val scores = manager.getLatestScores()
+        // simple weighted sum — later replace with log-odds Bayesian fusion
+        val wTouch = 0.3f; val wKey = 0.3f; val wMotion = 0.2f; val wApp = 0.2f
+        val raw = wTouch * (scores["touch"] ?: 0f) +
+                  wKey * (scores["keystroke"] ?: 0f) +
+                  wMotion * (scores["motion"] ?: 0f) +
+                  wApp * (scores["app"] ?: 0f)
+        // smooth
+        smoothedRisk = alpha * raw + (1 - alpha) * smoothedRisk
+        return smoothedRisk.coerceIn(0f, 1f)
+    }
+}
