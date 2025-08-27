@@ -1,0 +1,65 @@
+package io.ennovatex.sentineledge.agents
+
+import android.content.Context
+import android.view.GestureDetector
+import android.view.MotionEvent
+import kotlinx.coroutines.*
+import org.tensorflow.lite.Interpreter
+import java.nio.MappedByteBuffer
+import java.nio.channels.FileChannel
+import android.content.res.AssetFileDescriptor
+import java.io.FileInputStream
+
+class TouchAgent(private val ctx: Context) {
+    private var running = false
+    var latestAnomalyScore: Float = 0.0f
+        private set
+
+    // small buffer of features
+    private val featureBuffer = ArrayList<FloatArray>()
+
+    // Load tflite model
+    private val interpreter: Interpreter? by lazy {
+        try {
+            val model = loadModelFile("models/base_touch_int8.tflite")
+            Interpreter(model)
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    fun start() {
+        running = true
+        // Hook into a global touch listener or overlay: for the skeleton we assume features are injected
+        // Start a coroutine to periodically run inference on collected features
+        CoroutineScope(Dispatchers.Default).launch {
+            while (running) {
+                if (featureBuffer.size >= 1) {
+                    val input = prepareInput(featureBuffer.removeAt(0))
+                    val out = Array(1) { FloatArray(1) }
+                    interpreter?.run(input, out)
+                    latestAnomalyScore = out[0][0]
+                }
+                delay(300) // inference cadence
+            }
+        }
+    }
+
+    fun stop() { running = false }
+
+    // Placeholder: caller will push touch features to agent
+    fun pushFeature(f: FloatArray) {
+        featureBuffer.add(f)
+    }
+
+    private fun prepareInput(features: FloatArray): Array<FloatArray> {
+        return arrayOf(features)
+    }
+
+    private fun loadModelFile(path: String): MappedByteBuffer {
+        val afd: AssetFileDescriptor = ctx.assets.openFd(path)
+        val fis = FileInputStream(afd.fileDescriptor)
+        val fc = fis.channel
+        return fc.map(FileChannel.MapMode.READ_ONLY, afd.startOffset, afd.length)
+    }
+}
