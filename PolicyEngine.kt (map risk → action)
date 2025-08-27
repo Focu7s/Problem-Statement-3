@@ -1,0 +1,38 @@
+package io.ennovatex.sentineledge.agents
+
+import android.content.Context
+import android.widget.Toast
+import kotlinx.coroutines.*
+
+class PolicyEngine(private val ctx: Context) {
+
+    fun applyPolicy(risk: Float) {
+        when {
+            risk < 0.3f -> { /* nothing */ }
+            risk < 0.6f -> { subtlePrompt() }             // low friction
+            risk < 0.85f -> { stepUpAuth() }              // require biometric/passcode
+            else -> { lockSession() }                     // high risk: lock
+        }
+    }
+
+    private fun subtlePrompt() {
+        // In real app: show banner. Here, simple toast for demo.
+        showToast("SentinelEdge: unusual behavior detected — please verify")
+    }
+
+    private fun stepUpAuth() {
+        // trigger biometric prompt / re-auth
+        showToast("SentinelEdge: please unlock to continue")
+    }
+
+    private fun lockSession() {
+        showToast("SentinelEdge: session locked due to high risk")
+        // Implement token revocation / local lock
+    }
+
+    private fun showToast(msg: String) {
+        CoroutineScope(Dispatchers.Main).launch {
+            Toast.makeText(ctx, msg, Toast.LENGTH_SHORT).show()
+        }
+    }
+}
