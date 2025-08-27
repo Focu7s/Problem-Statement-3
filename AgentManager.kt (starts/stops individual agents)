@@ -1,0 +1,33 @@
+package io.ennovatex.sentineledge.agents
+
+import android.content.Context
+
+class AgentManager(private val ctx: Context) {
+    private val touchAgent = TouchAgent(ctx)
+    private val keystrokeAgent = KeystrokeAgent(ctx)
+    private val motionAgent = MotionAgent(ctx)
+    private val appUsageAgent = AppUsageAgent(ctx)
+
+    fun startAll() {
+        touchAgent.start()
+        keystrokeAgent.start()
+        motionAgent.start()
+        appUsageAgent.start()
+    }
+    fun stopAll() {
+        touchAgent.stop()
+        keystrokeAgent.stop()
+        motionAgent.stop()
+        appUsageAgent.stop()
+    }
+
+    // Expose per-agent anomaly scores (or features) for fusion
+    fun getLatestScores(): Map<String, Float> {
+        return mapOf(
+            "touch" to touchAgent.latestAnomalyScore,
+            "keystroke" to keystrokeAgent.latestAnomalyScore,
+            "motion" to motionAgent.latestAnomalyScore,
+            "app" to appUsageAgent.latestAnomalyScore
+        )
+    }
+}
