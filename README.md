@@ -19,10 +19,10 @@ Portable: works on Android (TFLite/LiteRT) and iOS (Core ML), optional Wear OS/w
 |                                                                                             |
 |  Sensors & Context        Feature Agents         Behavior Models        Risk & Response     |
 |  -----------------        --------------        ----------------        ---------------     |
-|  - Touch events           - Touch Agent         - Touch HMM/TCN        - Risk Fusion       |
-|  - Key timings            - Keystroke Agent     - Keystroke TCN/GRU    - Policy Engine     |
-|  - Motion (accel/gyro)    - Motion Agent        - Gait CNN/GRU         - Action Manager    |
-|  - App usage/foreground   - App-Usage Agent     - App n-gram Seq2Seq   - Audit & Telemetry |
+|  - Touch events           - Touch Agent         - Touch HMM/TCN        - Risk Fusion        |
+|  - Key timings            - Keystroke Agent     - Keystroke TCN/GRU    - Policy Engine       |
+|  - Motion (accel/gyro)    - Motion Agent        - Gait CNN/GRU         - Action Manager      |
+|  - App usage/foreground   - App-Usage Agent     - App n-gram Seq2Seq   - Audit & Telemetry   |
 |  - Device posture/GPS*    - Context Agent       - Context embedding     - On-device logs    |
 |                           - Anti‑Spoof Agent    - Liveness classifier   - UI Prompts        |
 |                                                                                             |
