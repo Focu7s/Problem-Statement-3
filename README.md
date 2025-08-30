@@ -23,7 +23,7 @@ Risk-fusion engine 🔐: adaptive responses → step-up auth 🔑, session lock 
 2) System Architecture
    
 2.1 High‑level Overview
-<img width="1036" height="1324" alt="image" src="https://github.com/user-attachments/assets/87061e66-8ba9-41d6-b60d-03dac53e382d" />
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/87061e66-8ba9-41d6-b60d-03dac53e382d" />
 
 🛡️ Sentinel-Edge: Modular On-Device Multi-Agent Security
 🌍 Privacy by Design
@@ -115,7 +115,7 @@ Transparency: explain prompts, privacy dashboard, reset option.
 ⚡ In short: Sentinel-Edge = 🧠 multi-agent learning + 🔒 on-device privacy + ⚡ real-time detection + 🎯 adaptive responses.
 
  Implementation Plan & Repo Layout
-   <img width="1036" height="1324" alt="image" src="https://github.com/user-attachments/assets/5439ab4b-7e5c-442c-ae8c-557b1bb9b689" />
+ <img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/5439ab4b-7e5c-442c-ae8c-557b1bb9b689" />
 
  Android (TFLite/LiteRT) Skeleton
 
@@ -280,10 +280,10 @@ Developer Mode:
 Logs, anomaly thresholds tuning ⚡.
 
 Some Snippets of how it will look :
-<img width="1036" height="1324"  alt="image" src="https://github.com/user-attachments/assets/f5cddb5a-2154-4380-b2cd-00529c5fa260" />
-<img width="1036" height="1324" alt="image" src="https://github.com/user-attachments/assets/05d562a3-dfb3-4398-8aad-7841d3b7228e" />
-<img width="1036" height="1324"  alt="image" src="https://github.com/user-attachments/assets/d20618d1-852d-453f-9c06-3cc317103db9" />
-<img width="1036" height="1324" alt="image" src="https://github.com/user-attachments/assets/844e8e56-7304-4ad4-960d-74622116f803" />
+<img width="1536" height="1024"  alt="image" src="https://github.com/user-attachments/assets/f5cddb5a-2154-4380-b2cd-00529c5fa260" />
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/05d562a3-dfb3-4398-8aad-7841d3b7228e" />
+<img width="1536" height="1024"  alt="image" src="https://github.com/user-attachments/assets/d20618d1-852d-453f-9c06-3cc317103db9" />
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/844e8e56-7304-4ad4-960d-74622116f803" />
 In Dark Mode :
 <img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/25343ac4-c464-40b4-9608-3ca5b3ceefa9" />
 
