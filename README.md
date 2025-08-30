@@ -1,137 +1,172 @@
 # Problem-Statement-3
-We propose Sentinel‑Edge, a modular on‑device multi‑agent system that learns each user’s behavioral biometrics and usage patterns locally and performs real‑time anomaly detection with no raw data leaving the device. The system uses lightweight models (TFLite/Core ML) with incremental on‑device personalization and a risk‑fusion policy engine to trigger graduated responses (step‑up auth, session lock, honeypot mode, etc.).
+🛡️ Sentinel-Edge: On-Device Multi-Agent Security System
 
-1) Key goals:
+Proposal:
+A modular, on-device multi-agent system that learns user behavioral biometrics & usage patterns locally 📱 and performs real-time anomaly detection ⚡ with zero raw data leaving the device 🌐❌.
 
-Privacy‑first: all sensitive behavioral signals remain on device; models are personalized locally.
-Real‑time: continuous streaming inference (<30 ms/segment targets) with battery‑aware scheduling.
-Resilient: detection for unauthorized access, bot‑like automation, replay/spoofing, device‑share drift.
-Portable: works on Android (TFLite/LiteRT) and iOS (Core ML), optional Wear OS/watchOS extensions.
+Lightweight ML Models 🤖: TFLite (Android) / Core ML (iOS).
+
+On-device personalization 🔄 with incremental updates.
+
+Risk-fusion engine 🔐: adaptive responses → step-up auth 🔑, session lock ⛔, honeypot mode 🎯.
+
+🎯 Key Goals
+
+🔒 Privacy-First: All sensitive behavioral signals remain on-device; models adapt locally.
+
+⚡ Real-Time: Continuous inference <30 ms/segment, battery-aware 🔋 scheduling.
+
+🛡️ Resilient: Detects unauthorized access 🚫, bot-like automation 🤖, replay/spoofing 🎭, device-share drift 🔄.
+
+📲 Portable: Cross-platform → Android (TFLite/LiteRT) & iOS (Core ML) with WearOS/watchOS ⌚ extensions.
 
 2) System Architecture
    
 2.1 High‑level Overview
 <img width="1036" height="1324" alt="image" src="https://github.com/user-attachments/assets/87061e66-8ba9-41d6-b60d-03dac53e382d" />
 
-GPS disabled by default; coarse activity inferred from motion to minimize data collection.
+🛡️ Sentinel-Edge: Modular On-Device Multi-Agent Security
+🌍 Privacy by Design
 
-2.2 Agent Roles
+GPS off by default 📴 → only coarse activity from motion.
 
-Touch Agent — captures swipe/scroll histograms, pressure/area (when available), gesture velocity/acceleration, micro‑tremor spectra.
-Keystroke Agent — inter‑key latencies (down–down, up–down), hold times, error/auto‑correct rates, keyboard layout context, language model state deltas.
-Motion Agent — micro‑gait signatures while typing/scrolling, device‑in‑hand dynamics; segments idle vs locomotion.
-App‑Usage Agent — temporal patterns (time‑of‑day, session length), foreground switches, notification interactions.
-Context Agent — coarse state: locked/unlocked, charging, network type, biometrics availability. No raw content.
-Anti‑Spoof & Bot Agent — detects scripted input (constant latencies, perfect periodicity), replay traces (low jitter), emulator signals.
-Risk Fusion — Bayesian/ensemble fusion of per‑agent anomaly scores; produces a single RiskScore ∈ [0,1].
-Policy/Response Engine — maps RiskScore + context → actions (soft prompts, step‑up auth, lock, hidden‑value throttle, decoy views/honeypot, local alert).
+Minimal signals only ⏱️📈 (timings, kinematics, state).
 
-2.3 Data Flow
-Ingestion → Featureization (windowed 3–10 s) → Per‑agent inference → Risk fusion (exponential decay & context priors) → Policy → Action → Secure audit (rolling window, encrypted at rest).
+All data local 🔒 — no raw data leaves device.
 
-3) Modeling Approach
-   
-3.1 Per‑Agent Models (lightweight)
+🤖 Agent Roles
 
-Touch: Temporal Convolutional Network (TCN) or 1D‑CNN on gesture sequences + frequency features; fallback: Gaussian Mixture Models (GMM) / One‑Class SVM for ultra‑low‑end devices.
+👆 Touch Agent → swipe/scroll histograms, velocity, micro-tremors.
 
-Keystroke: GRU/TCN on timing vectors; derived n‑gram timing embeddings; fallback: Univariate thresholds + Mahalanobis distance on handcrafted features.
+⌨️ Keystroke Agent → inter-key latencies, hold times, error rates.
 
-Motion/Gait: CNN‑GRU over accelerometer/gyroscope windows; spectral roll‑off, entropy features.
+📱 Motion Agent → gait signatures, device-in-hand dynamics, idle vs moving.
 
-App‑Usage: PPM/n‑gram or compact transformer for next‑app prediction; anomaly = low next‑token probability.
+📊 App-Usage Agent → time-of-day, session length, switch patterns.
 
-Anti‑Spoof: Lightweight liveness classifier + rule features (jitter variance, quantization artifacts, emulator flags) → logistic regression.
+🔑 Context Agent → lock state, charging, network, biometrics availability.
 
-All models exported as .tflite (Android) or .mlmodel (iOS). Quantization: int8 post‑training where possible; mixed‑precision for timing models.
+🕵️ Anti-Spoof/Bot Agent → detects automation, replay, emulator use.
 
-3.2 Personalization & Continual Learning
+🧮 Risk Fusion → Bayesian/ensemble anomaly fusion → RiskScore ∈ [0,1].
 
-Cold‑start: population priors (generic models) with fast personalization via EMA‑adapted centroids and probability‑ratio calibration over first N sessions.
+⚡ Policy Engine → maps RiskScore + context → graduated actions.
 
-Online updates: periodic prototype rehearsal (small exemplar buffer) + elastic weight consolidation (EWC‑lite) for neural heads to resist drift.
+🔄 Data Flow
 
-Private training: all gradient steps local; no raw samples leave device. Optional federated averaging of encrypted gradients is disabled by default (can be made opt‑in with DP noise).
+Ingestion 📥 → Featureization (3–10s) ⏱️ → Agent inference 🤖 → Risk fusion 🧮 → Policy → Action 🚨 → Secure audit 🔐.
 
-3.3 Risk Fusion
+🧠 Modeling Approach
 
-Normalize per‑agent anomaly scores with calibrated Platt scaling.
+Touch: TCN / 1D-CNN, fallback GMM/SVM.
 
-Fuse using Bayesian log‑odds with context priors (time, location coarse state, unlock method).
+Keystroke: GRU/TCN embeddings; fallback thresholds + Mahalanobis.
 
-Temporal smoothing via exponential decay and CUSUM to detect sudden shifts.
+Motion: CNN-GRU on accelerometer/gyro; spectral features.
 
-4) Privacy, Security & Trust
+App-Usage: n-gram/compact transformer; anomaly = low next-token probability.
 
-Data minimization: capture only timings/kinematics, not content; strip key codes, store only positions in coarse bins.
+Anti-Spoof: liveness classifier + rules → logistic regression.
 
-Secure storage: encrypted feature store; model keys in hardware‑backed keystore/secure enclave; bind personalization to device/OS install.
+Deployment: .tflite (Android) / .mlmodel (iOS), int8 quantization ⚡.
 
-Attack surface & mitigations:
+🔄 Personalization & Continual Learning
 
-Replay/bot: detect low‑jitter sequences, unnatural periodicity, input automation APIs, emulator heuristics.
+Cold-start: population priors → fast local adaptation.
 
-Shoulder‑surf / handover: rapid touch‑dynamics divergence + motion signature mismatch triggers step‑up auth.
+Online: prototype rehearsal + EWC-lite to resist drift.
 
-Poisoning: require trusted context (recent biometric/passcode unlock) for learning; cap per‑epoch updates; outlier‑robust losses.
+Private training: all updates on-device; federated mode opt-in only.
 
-Model extraction: encrypt model files at rest; integrity tag; runtime attestation checks (root/debug/emulator flags → disable learning & throttle features).
+🧮 Risk Fusion
 
-Compliance notes: all processing is on‑device; provide clear consent screens and a privacy switch to pause collection and wipe learned state.
+Platt-scaled per-agent anomaly scores.
 
-5) UX & Response Policies
+Bayesian log-odds + context priors.
 
-Medium: step‑up (biometric/passcode), rate‑limit sensitive actions, mask balances/PII.
+Temporal smoothing (exponential decay, CUSUM).
 
-High: session lock, revoke tokens, switch to honeypot/decoy data view, require full login.
+🔐 Privacy, Security & Trust
 
-Accessibility & transparency: explain why a challenge occurred; provide a privacy dashboard and local data reset.
+Data minimization: only timings/kinematics, no content.
 
-6) Implementation Plan & Repo Layout
+Secure storage: hardware keystore / secure enclave.
+
+Threats & mitigations:
+
+Replay/bots 🤖 → jitter/periodicity checks.
+
+Shoulder-surf/handover 👀 → motion mismatch → step-up auth.
+
+Poisoning 🧪 → trusted context gating + outlier-robust training.
+
+Model extraction 🛡️ → encryption, attestation, throttle on root/debug.
+
+Consent & compliance: privacy switch + local wipe/reset.
+
+🎛️ UX & Response Policies
+
+Medium Risk: step-up auth 🔑, rate-limit, mask balances/PII.
+
+High Risk: lock ⛔, revoke tokens 🔓, honeypot mode 🎭.
+
+Transparency: explain prompts, privacy dashboard, reset option.
+
+⚡ In short: Sentinel-Edge = 🧠 multi-agent learning + 🔒 on-device privacy + ⚡ real-time detection + 🎯 adaptive responses.
+
+ Implementation Plan & Repo Layout
    <img width="1036" height="1324" alt="image" src="https://github.com/user-attachments/assets/5439ab4b-7e5c-442c-ae8c-557b1bb9b689" />
 
-6.1 Android (TFLite/LiteRT) skeleton
+ Android (TFLite/LiteRT) Skeleton
 
-Kotlin services per agent using foreground service only when required; otherwise JobScheduler/WorkManager with battery‑aware cadence.
+Kotlin services per agent via foreground service only when needed; else JobScheduler/WorkManager with battery-aware cadence.
 
-TFLite Interpreter with GPU/NN delegate if present; fall back to CPU.
+TFLite Interpreter with GPU/NN delegate if available; CPU fallback.
 
-Keystore‑backed encryption for feature store; biometric‑gated learning.
+Keystore-backed encryption for feature store; biometric-gated learning.
 
-6.2 iOS (Core ML) skeleton
+iOS (Core ML) Skeleton
 
 Swift Combine pipelines to collect events; background tasks for batching.
 
-MLUpdateTask for on‑device updates; ModelConfiguration with low‑memory options.
+MLUpdateTask for on-device model updates; ModelConfiguration tuned for low memory.
 
-7) Feature Engineering (examples)
+Feature Engineering
 
-Touch: dwell time, path curvature, velocity quantiles, micro‑tremor PSD, pressure deltas, two‑finger ratios.
+Touch 👆: dwell time, path curvature, velocity quantiles, tremor PSD, pressure deltas, two-finger ratios.
+Keystroke ⌨️: KD, UD, DU latencies, digraph/trigraph stats, error bursts, adaptive WPM baseline, backspace/autocorrect cadence.
+Motion 📱: energy in 0.8–3 Hz band, device-in-hand vs table heuristics, orientation transitions.
+App Usage 📊: session entropy, Markov next-app prob., unusual foreground app timing, notification lag.
 
-Keystroke: KD, UD, DU latencies, digraph/trigraph stats, error bursts, adaptive WPM baseline, autocorrect/ backspace cadence.
+ Evaluation Protocol
 
-Motion: energy in 0.8–3 Hz band (hand tremor), device‑in‑hand vs table heuristics, orientation transitions.
+Datasets (pretrain/benchmark): HMOG (touch+motion), Aalto (keystroke), SHL (locomotion).
 
-App‑Usage: session entropy, Markov next‑app prob., unusual foreground at unusual time, notification interaction lag.
+User Study: opt-in, with synthetic adversary sessions (scripted taps, emulator, device handover).
 
-8) Evaluation Protocol
+Metrics: EER, ROC-AUC per agent; TTD (Time-to-Detect); Battery cost (mWh/hr); False Intervention Rate/day.
 
-Datasets for pretraining/benchmarking (public): HMOG (touch+motion), Aalto (keystroke timing), SHL (locomotion) for context robustness.
+Ablations: model vs rule-only; fusion strategies; quantization modes.
 
-User study (opt‑in): synthetic adversary sessions (scripted taps, emulator, different user handover).
+ Risk & Edge Cases
 
-Metrics: EER, ROC‑AUC per agent; Time‑to‑Detect (TTD); Battery cost (mWh/hr); False Intervention Rate per day.
+Shared device/guest: temp profile, auto-expire.
 
-Ablations: model vs rule‑only; fusion strategies; quantization modes.
+Cold start: wide thresholds until N trusted sessions; raise friction only for high-risk actions.
 
-9) Risk & Edge Cases
+Mode changes (injury/new keyboard): warm-up learning rate + volatility detector.
 
-Shared device / guest mode: quick secondary profile with temporary baseline; auto‑expire.
+Adaptive Risk-Based Authentication (ARBA)
 
-Cold start: widen thresholds until N trusted sessions; increase friction only for high‑risk actions.
+🎯 Principle → anomaly ≠ auto-block; escalate based on severity.
 
-Mode changes (injury, new keyboard): learning rate warm‑up + volatility detector to reduce over‑correction.
-We can add one more feature of Adaptive Risk-Based Authentication (ARBA). When an anomaly is detected, instead of immediately blocking the user, the system can request a secondary verification method (fingerprint, face ID, or security question) depending on the severity of the anomaly. This ensures usability while maintaining strong security.
+⚖️ Risk tiers: Low 🟢 (monitor only), Medium 🟡 (step-up auth), High 🔴 (session lock + full re-auth).
+
+🔐 Local-only using BiometricPrompt (Android), LAContext (iOS).
+
+⚙️ Adaptive: context drift, failed unlocks, guest/travel mode.
+
+📊 Metrics: false intervention rate vs detection latency.
 
 🖼️ SentinelEdge App – UI/UX Flow (Technical View)
 
