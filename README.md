@@ -1,5 +1,5 @@
 # Problem-Statement-3
-🛡️ Sentinel-Edge: On-Device Multi-Agent Security System
+App Name : 🛡️ Sentinel-Edge: On-Device Multi-Agent Security System
 
 Proposal:
 A modular, on-device multi-agent system that learns user behavioral biometrics & usage patterns locally 📱 and performs real-time anomaly detection ⚡ with zero raw data leaving the device 🌐❌.
