@@ -1,58 +1,31 @@
 # Problem-Statement-3
-1) Executive Summary
-
 We propose Sentinel‑Edge, a modular on‑device multi‑agent system that learns each user’s behavioral biometrics and usage patterns locally and performs real‑time anomaly detection with no raw data leaving the device. The system uses lightweight models (TFLite/Core ML) with incremental on‑device personalization and a risk‑fusion policy engine to trigger graduated responses (step‑up auth, session lock, honeypot mode, etc.).
 
-Key goals:
+1) Key goals:
 
 Privacy‑first: all sensitive behavioral signals remain on device; models are personalized locally.
-
 Real‑time: continuous streaming inference (<30 ms/segment targets) with battery‑aware scheduling.
-
 Resilient: detection for unauthorized access, bot‑like automation, replay/spoofing, device‑share drift.
-
 Portable: works on Android (TFLite/LiteRT) and iOS (Core ML), optional Wear OS/watchOS extensions.
 
 2) System Architecture
 2.1 High‑level Overview
-+----------------------------- Sentinel-Edge Runtime (On Device) -----------------------------+
-|                                                                                             |
-|  Sensors & Context        Feature Agents         Behavior Models        Risk & Response     |
-|  -----------------        --------------        ----------------        ---------------     |
-|  - Touch events           - Touch Agent         - Touch HMM/TCN        - Risk Fusion        |
-|  - Key timings            - Keystroke Agent     - Keystroke TCN/GRU    - Policy Engine       |
-|  - Motion (accel/gyro)    - Motion Agent        - Gait CNN/GRU         - Action Manager      |
-|  - App usage/foreground   - App-Usage Agent     - App n-gram Seq2Seq   - Audit & Telemetry   |
-|  - Device posture/GPS*    - Context Agent       - Context embedding     - On-device logs    |
-|                           - Anti‑Spoof Agent    - Liveness classifier   - UI Prompts        |
-|                                                                                             |
-|                    <----- Shared Ring Buffers + Feature Store + Keychain ----->             |
-|                                                                                             |
-|                   On‑Device Personalization (LiteRT/Core ML update, EMA/PLR)                |
-+---------------------------------------------------------------------------------------------+
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/87061e66-8ba9-41d6-b60d-03dac53e382d" />
 
-* GPS disabled by default; coarse activity inferred from motion to minimize data collection.
+GPS disabled by default; coarse activity inferred from motion to minimize data collection.
 
 2.2 Agent Roles
 
 Touch Agent — captures swipe/scroll histograms, pressure/area (when available), gesture velocity/acceleration, micro‑tremor spectra.
-
 Keystroke Agent — inter‑key latencies (down–down, up–down), hold times, error/auto‑correct rates, keyboard layout context, language model state deltas.
-
 Motion Agent — micro‑gait signatures while typing/scrolling, device‑in‑hand dynamics; segments idle vs locomotion.
-
 App‑Usage Agent — temporal patterns (time‑of‑day, session length), foreground switches, notification interactions.
-
 Context Agent — coarse state: locked/unlocked, charging, network type, biometrics availability. No raw content.
-
 Anti‑Spoof & Bot Agent — detects scripted input (constant latencies, perfect periodicity), replay traces (low jitter), emulator signals.
-
 Risk Fusion — Bayesian/ensemble fusion of per‑agent anomaly scores; produces a single RiskScore ∈ [0,1].
-
 Policy/Response Engine — maps RiskScore + context → actions (soft prompts, step‑up auth, lock, hidden‑value throttle, decoy views/honeypot, local alert).
 
 2.3 Data Flow
-
 Ingestion → Featureization (windowed 3–10 s) → Per‑agent inference → Risk fusion (exponential decay & context priors) → Policy → Action → Secure audit (rolling window, encrypted at rest).
 
 3) Modeling Approach
@@ -117,32 +90,8 @@ High: session lock, revoke tokens, switch to honeypot/decoy data view, require f
 Accessibility & transparency: explain why a challenge occurred; provide a privacy dashboard and local data reset.
 
 6) Implementation Plan & Repo Layout
-repo/
-├── README.md                          # per template root
-├── docs/
-│   ├── TECHNICAL_SOLUTION.md          # this document
-│   ├── ARCHITECTURE.md                # detailed diagrams & flows
-│   ├── PRIVACY_SECURITY.md            # threat model & mitigations
-│   ├── EVALUATION.md                  # metrics, protocols
-│   └── UX_POLICY.md                   # risk thresholds & UI copy
-└── src/
-    ├── android/
-    │   ├── app/
-    │   │   ├── java/...               # agents, fusion, policy
-    │   │   ├── assets/models/         # .tflite models
-    │   │   └── jni/                   # optional native feat.
-    │   └── build.gradle
-    ├── ios/
-    │   ├── SentinelEdge/
-    │   │   ├── Agents/                # Swift agents
-    │   │   ├── Models/                # .mlmodel
-    │   │   └── Policy/
-    │   └── Podfile / Package.swift
-    └── models/
-        ├── base_touch_int8.tflite
-        ├── base_keystroke_fp16.tflite
-        ├── base_motion_int8.tflite
-        └── app_usage_ppm.bin
+   <img width="1024" height="1536" alt="image" src="https://github.com/user-attachments/assets/5439ab4b-7e5c-442c-ae8c-557b1bb9b689" />
+
 6.1 Android (TFLite/LiteRT) skeleton
 
 Kotlin services per agent using foreground service only when required; otherwise JobScheduler/WorkManager with battery‑aware cadence.
@@ -184,3 +133,81 @@ Shared device / guest mode: quick secondary profile with temporary baseline; aut
 Cold start: widen thresholds until N trusted sessions; increase friction only for high‑risk actions.
 
 Mode changes (injury, new keyboard): learning rate warm‑up + volatility detector to reduce over‑correction.
+We can add one more feature of Adaptive Risk-Based Authentication (ARBA). When an anomaly is detected, instead of immediately blocking the user, the system can request a secondary verification method (fingerprint, face ID, or security question) depending on the severity of the anomaly. This ensures usability while maintaining strong security.
+
+🖼️ SentinelEdge App – UI/UX Flow (Technical View)
+🚀 Splash Screen / Logo
+Background: Dark gradient with glowing 🛡️ shield + 🌊 edge wave icon (symbolizing on-device edge security).
+Text: “SentinelEdge – Secure 🔒. Private 🕶️. On-Device 📱.”
+Loading Animation: Circular pulse with neural net lines ⚡.
+🏠 Home Dashboard
+Real-time Risk Status Indicator:
+🟢 Safe – No anomalies detected.
+🟡 Suspicious – Behavior deviation noted.
+🔴 High Risk – Possible fraud attempt.
+
+Quick Summary Panel:
+“Behavioral monitoring active ✅ – no anomalies detected.”
+Controls:
+📊 View Report button.
+⚙️ Go to Settings.
+⚠️ Anomaly Alerts Screen
+Feed of Recent Events:
+“📱 Unusual touch pattern detected – 12:45 PM.”
+“⌨️ Typing rhythm anomaly – 14:10 PM.”
+Severity Badges:
+🟢 Low | 🟡 Medium | 🔴 High
+Action Buttons:
+🛑 Block Activity
+🔄 Re-Verify
+📑 Detailed Report Screen
+Visualization Tools:
+📊 Line charts for typing rhythm latency.
+📈 Scatter plots for touch pressure vs speed.
+📉 Motion activity timeline.
+Timeline:
+Sequential anomaly logs with timestamps.
+Export Options:
+⬇️ Save locally
+🔒 Encrypted share option.
+🔐 Adaptive Risk-Based Authentication (ARBA)
+
+Triggered on 🔴 High Risk event.
+Dynamic Verification Modal:
+😷 Face ID (Biometric AI verification).
+🖐️ Fingerprint scan.
+🔢 OTP challenge.
+
+Smart Decision Engine:
+Severity-based adaptive flow (e.g., fingerprint for medium anomaly, FaceID + OTP for critical anomaly).
+
+Action Button:
+🛡️ Verify Identity.
+⚙️ Settings & Customization
+
+Agent Selection:
+
+📱 Touch Pattern Agent.
+⌨️ Keystroke Dynamics Agent.
+🌀 Motion & Gyro Agent.
+📂 App Usage Agent.
+
+Privacy Controls:
+“All data remains on-device 🔒 – zero cloud upload.”
+
+UI Preferences:
+🌞 Light Mode / 🌙 Dark Mode toggle.
+
+Developer Mode:
+Logs, anomaly thresholds tuning ⚡.
+
+Some Snippets of how it will look :
+<img width="1024" height="1536" alt="image" src="https://github.com/user-attachments/assets/f5cddb5a-2154-4380-b2cd-00529c5fa260" />
+\<img width="1024" height="1536" alt="image" src="https://github.com/user-attachments/assets/05d562a3-dfb3-4398-8aad-7841d3b7228e" />
+<img width="1024" height="1536" alt="image" src="https://github.com/user-attachments/assets/d20618d1-852d-453f-9c06-3cc317103db9" />
+<img width="1024" height="1536" alt="image" src="https://github.com/user-attachments/assets/844e8e56-7304-4ad4-960d-74622116f803" />
+In Dark Mode :
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/25343ac4-c464-40b4-9608-3ca5b3ceefa9" />
+
+
+
