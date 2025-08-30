@@ -10,7 +10,7 @@ Portable: works on Android (TFLite/LiteRT) and iOS (Core ML), optional Wear OS/w
 
 2) System Architecture
 2.1 High‑level Overview
-<img width="150" height="300" alt="image" src="https://github.com/user-attachments/assets/87061e66-8ba9-41d6-b60d-03dac53e382d" />
+<img width="1036" height="1324" alt="image" src="https://github.com/user-attachments/assets/87061e66-8ba9-41d6-b60d-03dac53e382d" />
 
 GPS disabled by default; coarse activity inferred from motion to minimize data collection.
 
