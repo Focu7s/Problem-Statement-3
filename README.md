@@ -30,6 +30,7 @@ Policy/Response Engine — maps RiskScore + context → actions (soft prompts, s
 Ingestion → Featureization (windowed 3–10 s) → Per‑agent inference → Risk fusion (exponential decay & context priors) → Policy → Action → Secure audit (rolling window, encrypted at rest).
 
 3) Modeling Approach
+   
 3.1 Per‑Agent Models (lightweight)
 
 Touch: Temporal Convolutional Network (TCN) or 1D‑CNN on gesture sequences + frequency features; fallback: Gaussian Mixture Models (GMM) / One‑Class SVM for ultra‑low‑end devices.
@@ -79,10 +80,6 @@ Model extraction: encrypt model files at rest; integrity tag; runtime attestatio
 Compliance notes: all processing is on‑device; provide clear consent screens and a privacy switch to pause collection and wipe learned state.
 
 5) UX & Response Policies
-
-Invisible by default; show gentle friction when risk crosses thresholds:
-
-Low: subtle banner, in‑app re‑auth suggestion.
 
 Medium: step‑up (biometric/passcode), rate‑limit sensitive actions, mask balances/PII.
 
@@ -137,6 +134,7 @@ Mode changes (injury, new keyboard): learning rate warm‑up + volatility detect
 We can add one more feature of Adaptive Risk-Based Authentication (ARBA). When an anomaly is detected, instead of immediately blocking the user, the system can request a secondary verification method (fingerprint, face ID, or security question) depending on the severity of the anomaly. This ensures usability while maintaining strong security.
 
 🖼️ SentinelEdge App – UI/UX Flow (Technical View)
+
 🚀 Splash Screen / Logo
 Background: Dark gradient with glowing 🛡️ shield + 🌊 edge wave icon (symbolizing on-device edge security).
 
@@ -252,7 +250,7 @@ Some Snippets of how it will look :
 <img width="1036" height="1324"  alt="image" src="https://github.com/user-attachments/assets/d20618d1-852d-453f-9c06-3cc317103db9" />
 <img width="1036" height="1324" alt="image" src="https://github.com/user-attachments/assets/844e8e56-7304-4ad4-960d-74622116f803" />
 In Dark Mode :
-<img width="1036" height="1324"  alt="image" src="https://github.com/user-attachments/assets/25343ac4-c464-40b4-9608-3ca5b3ceefa9" />
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/25343ac4-c464-40b4-9608-3ca5b3ceefa9" />
 
 
 
