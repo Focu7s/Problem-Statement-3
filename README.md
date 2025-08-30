@@ -23,7 +23,8 @@ Risk-fusion engine 🔐: adaptive responses → step-up auth 🔑, session lock 
 2) System Architecture
    
 2.1 High‑level Overview
-<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/e193d301-1ce8-45d2-bcb5-b5a6243d7740" />
+<img width="1263" height="523" alt="image" src="https://github.com/user-attachments/assets/dd56673b-0e4b-4765-8400-3289acb8274b" />
+
 
 
 🛡️ Sentinel-Edge: Modular On-Device Multi-Agent Security
